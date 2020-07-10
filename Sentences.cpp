@@ -7,6 +7,8 @@
 bool readSent(const char* filename, vector <Set <unsigned char>>& sentences);
 bool readSent(const char* filename, vector<vector<string>>& sent_numb);
 
+bool readSyl(const char* filename, vector <Set <string>>& sentences);
+
 int main()
 {
 	setlocale(LC_ALL, "Russian");
@@ -42,24 +44,18 @@ int main()
 		i++;
 
 	}*/
-	set <string> s1, s2;
-	s1.insert("ши");
-	s1.insert("жи");
-	s2.insert("ши");
-	s2.insert("жи");
-	Set <string> first (s1);
-	Set <string> second (s2);
-	bool a = first != second;
-	bool b = first == second;
-	cout <<first<<" != "<<second<<" = "<<a<<endl;
-	cout << first << " == " << second << " = " << b<<endl;
+	vector <Set <string>> syllables;
+	readSyl("Text2.txt", syllables);
+	bool a;
+	for (vector<Set<string>>::iterator it = syllables.begin(); it != syllables.end(); it++) {
+		for (vector<Set<string>>::iterator it2 = it; it2 != syllables.end(); it2++) {
+			if (it != it2) {
+				a = *it == *it2;
+				cout << *it << " == " << *it2 << " = " << a<<endl;
+			}
+		}
+	}
 
-	s2.insert("ла");
-	Set <string> third(s2);
-	a = first != third;
-	b = first == third;
-	cout << first << " != " << third << " = " << a << endl;
-	cout << first << " == " << third << " = " << b;
 	return 0;
 }
 
@@ -106,6 +102,31 @@ bool readSent(const char* filename, vector<vector<string>>& sent_numb) {
 			sent.push_back(" ");   //добавляем пробел между словами
 		} while (s.find('.') > 100 && s.find('?') > 100 && s.find('!') > 100);		//пока не встретим . ! или ?
 		sent_numb.push_back(sent);		//записываем предложение в вектор предложений
+	}
+	in.close();
+	return true;
+}
+
+bool readSyl(const char* filename, vector <Set <string>>& syllables) {
+	ifstream in(filename);
+	string s;
+	if (!in.is_open())
+	{
+		cout << "Can't open the file.";
+		return false;
+	}
+	while (!in.eof()) {
+		Set <string> syl;
+		bool end = false;
+		do {
+			in >> s;	
+			if (s.find('.') < 100) {
+				s.pop_back();
+				end = true;
+			}
+			syl.addToSet(s);	
+		} while (end==0);		//пока не встретим . ! или ?
+		syllables.push_back(syl);		//записываем слоги в вектор слогов
 	}
 	in.close();
 	return true;
